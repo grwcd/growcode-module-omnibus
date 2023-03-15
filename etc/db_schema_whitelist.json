@@ -1,0 +1,17 @@
+{
+    "growcode_omnibus_catalog_product_price_history": {
+        "column": {
+            "history_id": true,
+            "product_id": true,
+            "website_id": true,
+            "price": true,
+            "timestamp": true
+        },
+        "index": {
+            "GROWCODE_OMNIBUS_CATALOG_PRODUCT_PRICE_HISTORY_TIMESTAMP": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    }
+}

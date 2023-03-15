@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+	<table name="growcode_omnibus_catalog_product_price_history" resource="default" engine="innodb" comment="Catalog Product Price History">
+		<column name="history_id" padding="10" xsi:type="int" unsigned="true" nullable="false" identity="true" comment="Id" />
+		<column name="product_id" nullable="false" xsi:type="int" comment="entity_id" identity="false" />
+		<column name="website_id" nullable="false" xsi:type="smallint" comment="website_id" identity="false" />
+		<column name="price" nullable="false" xsi:type="decimal" comment="price" scale="4" precision="12" />
+		<column name="timestamp" nullable="false" xsi:type="datetime" comment="date" default="CURRENT_TIMESTAMP" />
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="history_id" />
+        </constraint>
+		<index referenceId="GROWCODE_OMNIBUS_CATALOG_PRODUCT_PRICE_HISTORY_TIMESTAMP" indexType="btree">
+			<column name="timestamp" />
+		</index>
+	</table>
+</schema>
