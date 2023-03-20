@@ -1,0 +1,33 @@
+<?php
+
+use Growcode\Omnibus\ViewModel\Product\HistoricalPrice;
+use Magento\Catalog\Block\Product\View;
+
+/** @var View $block */
+/** @var HistoricalPrice $historicalPriceViewModel */
+
+$historicalPriceViewModel = $block->getHistoricalPrice();
+$product = $block->getProduct();
+
+if (!$historicalPriceViewModel->hasDiscount($product)) {
+    return;
+}
+
+$lowestHistoricalPrice = $historicalPriceViewModel->getLowestHistoricalPrice($block->getProduct()->getId());
+$price = $lowestHistoricalPrice ? $lowestHistoricalPrice->getPrice() : $product->getFinalPrice();
+$formattedPrice = $historicalPriceViewModel->formatPrice($price);
+?>
+<div class="historical-price">
+    <?= __('Lowest price over the past 30 days: %1', $formattedPrice); ?>
+</div>
+<script type="text/x-magento-init">
+    {
+        ".historical-price": {
+            "Growcode_Omnibus/js/historical-price": {
+                "lowestHistoricalPrices": <?= $historicalPriceViewModel->getConfigurableProductLowestHistoricalPrices($product); ?>,
+                "priceBox": "[data-role='priceBox']",
+                "priceFormat": <?= $historicalPriceViewModel->getPriceFormat(); ?>
+            }
+        }
+    }
+</script>
