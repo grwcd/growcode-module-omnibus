@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Growcode\Omnibus\Api\HistoricalPriceRepositoryInterface" type="Growcode\Omnibus\Model\HistoricalPriceRepository" />
+    <preference for="Growcode\Omnibus\Api\Data\HistoricalPriceInterface" type="Growcode\Omnibus\Model\HistoricalPrice" />
+    <preference for="Growcode\Omnibus\Api\Data\HistoricalPriceSearchResultsInterface" type="Magento\Framework\Api\SearchResults" />
+</config>
