@@ -3,4 +3,7 @@
     <event name="catalog_product_save_after">
         <observer name="growcode_omnibus_product_save_after" instance="Growcode\Omnibus\Observer\ProductSaveAfter" />
     </event>
+    <event name="catalogrule_rule_save_after">
+        <observer name="growcode_omnibus_catalogrule_rule_save_after" instance="Growcode\Omnibus\Observer\CatalogruleSaveAfter" />
+    </event>
 </config>

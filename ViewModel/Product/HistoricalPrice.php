@@ -41,10 +41,10 @@ class HistoricalPrice implements ArgumentInterface
     /**
      * @var ProductRepositoryInterface
      */
-    private ProductRepositoryInterface $productRepository;
+    protected ProductRepositoryInterface $productRepository;
 
     /**
-     * @var FormatInterface 
+     * @var FormatInterface
      */
     private FormatInterface $localeFormat;
 
@@ -91,8 +91,7 @@ class HistoricalPrice implements ArgumentInterface
             ->setOrder('price', Collection::SORT_ORDER_ASC);
 
         if ($collection->count()) {
-            /** @var HistoricalPriceInterface */
-            return $collection->getFirstItem();
+            return $this->getFirstPrice($collection, $productId);
         }
 
         $collection = $this->collectionFactory->create();
@@ -104,8 +103,31 @@ class HistoricalPrice implements ArgumentInterface
             return null;
         }
 
-        /** @var HistoricalPriceInterface */
-        return $collection->getFirstItem();
+        return $this->getFirstPrice($collection, $productId);
+    }
+
+    /**
+     * @param Collection $collection
+     * @param int $productId
+     * @return HistoricalPriceInterface
+     */
+    public function getFirstPrice(Collection $collection, int $productId): ?HistoricalPriceInterface
+    {
+        try {
+            $product = $this->productRepository->getById($productId);
+        } catch (NoSuchEntityException $e) {
+            /** @var HistoricalPriceInterface */
+            return $collection->getFirstItem();
+        }
+
+        /** @var HistoricalPriceInterface $item */
+        foreach ($collection as $item) {
+            if ($item->getPrice() !== $product->getFinalPrice()) {
+                return $item;
+            }
+        }
+
+        return null;
     }
 
     /**

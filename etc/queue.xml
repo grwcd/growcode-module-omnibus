@@ -1,0 +1,9 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/queue.xsd">
+    <broker topic="growcode.omnibus.catalog_rule.update" exchange="magento-db" type="db">
+        <queue name="growcode.omnibus.catalog_rule.update"
+               consumer="growcode.omnibus.catalog_rule.update"
+               consumerInstance="Magento\Framework\MessageQueue\Consumer"
+               handler="Growcode\Omnibus\Model\CatalogRuleUpdateConsumer::process" />
+    </broker>
+</config>
