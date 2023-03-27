@@ -14,7 +14,7 @@ if (!$historicalPriceViewModel->hasDiscount($product)) {
 }
 
 $lowestHistoricalPrice = $historicalPriceViewModel->getLowestHistoricalPrice($block->getProduct()->getId());
-$price = $lowestHistoricalPrice ? $lowestHistoricalPrice->getPrice() : $product->getFinalPrice();
+$price = $lowestHistoricalPrice ? $lowestHistoricalPrice->getPrice() : $product->getPrice();
 $formattedPrice = $historicalPriceViewModel->formatPrice($price);
 ?>
 <div class="historical-price">

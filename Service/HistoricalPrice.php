@@ -75,7 +75,7 @@ class HistoricalPrice
     /**
      * @throws LocalizedException
      */
-    protected function savePriceChange(ProductInterface $product, float $price)
+    public function savePriceChange(ProductInterface $product, float $price)
     {
         $websiteId = $this->storeManager->getWebsite()->getId();
         $catalogRules = $this->catalogRule->getRulesFromProduct(time(), $websiteId, 0, $product->getId());
