@@ -122,7 +122,7 @@ class HistoricalPrice implements ArgumentInterface
 
         /** @var HistoricalPriceInterface $item */
         foreach ($collection as $item) {
-            if ($item->getPrice() !== $product->getFinalPrice()) {
+            if ($item->getPrice() != $product->getFinalPrice()) {
                 return $item;
             }
         }
@@ -137,7 +137,7 @@ class HistoricalPrice implements ArgumentInterface
      */
     public function formatPrice(float $price, bool $includeContainer = true): string
     {
-        return $this->priceCurrency->format($price, $includeContainer);
+        return $this->priceCurrency->convertAndFormat($price, $includeContainer);
     }
 
     /**

@@ -13,8 +13,9 @@ if (!$historicalPriceViewModel->hasDiscount($product)) {
     return;
 }
 
+$regularPrice = $product->getPriceInfo()->getPrice('regular_price')->getValue();
 $lowestHistoricalPrice = $historicalPriceViewModel->getLowestHistoricalPrice($block->getProduct()->getId());
-$price = $lowestHistoricalPrice ? $lowestHistoricalPrice->getPrice() : $product->getPrice();
+$price = $lowestHistoricalPrice ? $lowestHistoricalPrice->getPrice() : $regularPrice;
 $formattedPrice = $historicalPriceViewModel->formatPrice($price);
 ?>
 <div class="historical-price">
