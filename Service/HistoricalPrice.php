@@ -57,16 +57,16 @@ class HistoricalPrice
     public function verifyPriceChange(ProductInterface $product)
     {
         $price = $product->getPrice();
-        $origPrice = floatval($product->getOrigData('price'));
+        $origPrice = $product->getOrigData('price');
 
-        if ($price !== $origPrice) {
+        if ($price != $origPrice) {
             $this->savePriceChange($product, $price);
         }
 
         if ($specialPrice = $product->getSpecialPrice()) {
             $origSpecialPrice = $product->getOrigData('special_price');
 
-            if ($specialPrice !== $origSpecialPrice) {
+            if ($specialPrice != $origSpecialPrice) {
                 $this->savePriceChange($product, $specialPrice);
             }
         }
@@ -77,21 +77,24 @@ class HistoricalPrice
      */
     public function savePriceChange(ProductInterface $product, float $price)
     {
-        $websiteId = $this->storeManager->getWebsite()->getId();
-        $catalogRules = $this->catalogRule->getRulesFromProduct(time(), $websiteId, 0, $product->getId());
+        $websiteIds = $product->getWebsiteIds();
 
-        if (!empty($catalogRules)) {
-            $catalogPrice = $this->catalogRule->getRulePrice(new DateTime(), $websiteId, 0, $product->getId());
+        foreach ($websiteIds as $websiteId) {
+            $catalogRules = $this->catalogRule->getRulesFromProduct(time(), $websiteId, 0, $product->getId());
 
-            if ($catalogPrice && $catalogPrice < $price) {
-                $price = $catalogPrice;
+            if (!empty($catalogRules)) {
+                $catalogPrice = $this->catalogRule->getRulePrice(new DateTime(), $websiteId, 0, $product->getId());
+
+                if ($catalogPrice && $catalogPrice < $price) {
+                    $price = $catalogPrice;
+                }
             }
-        }
 
-        $model = $this->historicalPriceFactory->create()
-            ->setProductId($product->getId())
-            ->setPrice($price)
-            ->setWebsiteId($websiteId);
-        $this->historicalPriceRepository->save($model);
+            $model = $this->historicalPriceFactory->create()
+                ->setProductId($product->getId())
+                ->setPrice($price)
+                ->setWebsiteId($websiteId);
+            $this->historicalPriceRepository->save($model);
+        }
     }
 }
