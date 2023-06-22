@@ -1,0 +1,40 @@
+<?php
+
+use Growcode\Omnibus\ViewModel\Product\HistoricalPrice;
+use Magento\Catalog\Block\Product\View;
+
+/** @var View $block */
+/** @var HistoricalPrice $historicalPriceViewModel */
+
+$historicalPriceViewModel = $block->getHistoricalPrice();
+$product = $block->getProduct();
+
+if (!$historicalPriceViewModel->hasDiscount($product)) {
+    return;
+}
+
+$regularPrice = $product->getPriceInfo()->getPrice('regular_price')->getValue();
+$lowestHistoricalPrice = $historicalPriceViewModel->getLowestHistoricalPrice($block->getProduct()->getId());
+$price = $lowestHistoricalPrice ? $lowestHistoricalPrice->getPrice() : $regularPrice;
+$formattedPrice = $historicalPriceViewModel->formatPrice($price);
+?>
+<script>
+    function initHistoricalPrice<?= $product->getId(); ?>() {
+        return {
+            lowestHistoricalPrices: <?= $historicalPriceViewModel->getConfigurableProductLowestHistoricalPrices($product); ?>,
+            formattedPrice: '<?= $formattedPrice; ?>',
+            eventListeners: {
+                ['@configurable-selection-changed.window'](event) {
+                    const { productIndex } = event.detail;
+                    const price = this.lowestHistoricalPrices[productIndex] ?? <?= $price ?>;
+                    this.formattedPrice = hyva.formatPrice(price);
+                },
+            }
+        }
+    }
+</script>
+<div x-data="initHistoricalPrice<?= $product->getId(); ?>()"
+     x-bind="eventListeners">
+    <span><?= __('Lowest price over the past 30 days:'); ?></span>
+    <span x-html="formattedPrice"></span>
+</div>
