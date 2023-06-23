@@ -1,3 +1,8 @@
+# 1.2.0
+*(2023-06-22)*
+
+- Module is compatible with Hyvä storefront
+
 # 1.1.1
 *(2023-04-03)*
 
