@@ -1,3 +1,8 @@
+# 1.3.0
+*(2023-08-01)*
+
+- Display lowest historical prices in product listing
+
 # 1.2.0
 *(2023-06-22)*
 
