@@ -1,3 +1,9 @@
+# 1.4.0
+- Display lowest historical prices in price boxes
+- Add method for rendering historical price message via the view model
+- Add long and short message variation
+- Fix displaying lowest historical price message for configurable products
+
 # 1.3.0
 *(2023-08-01)*
 
