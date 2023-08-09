@@ -14,6 +14,8 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Locale\FormatInterface;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
+use Magento\Framework\View\Element\Template;
+use Magento\Framework\View\LayoutInterface;
 use Magento\Store\Model\StoreManagerInterface;
 
 class HistoricalPrice implements ArgumentInterface
@@ -49,12 +51,18 @@ class HistoricalPrice implements ArgumentInterface
     private FormatInterface $localeFormat;
 
     /**
+     * @var LayoutInterface
+     */
+    private LayoutInterface $layout;
+
+    /**
      * @param CollectionFactory $collectionFactory
      * @param PriceCurrencyInterface $priceCurrency
      * @param StoreManagerInterface $storeManager
      * @param CatalogRule $catalogRule
      * @param ProductRepositoryInterface $productRepository
      * @param FormatInterface $localeFormat
+     * @param LayoutInterface $layout
      */
     public function __construct(
         CollectionFactory          $collectionFactory,
@@ -62,7 +70,8 @@ class HistoricalPrice implements ArgumentInterface
         StoreManagerInterface      $storeManager,
         CatalogRule                $catalogRule,
         ProductRepositoryInterface $productRepository,
-        FormatInterface            $localeFormat
+        FormatInterface            $localeFormat,
+        LayoutInterface            $layout
     )
     {
         $this->collectionFactory = $collectionFactory;
@@ -71,6 +80,7 @@ class HistoricalPrice implements ArgumentInterface
         $this->catalogRule = $catalogRule;
         $this->productRepository = $productRepository;
         $this->localeFormat = $localeFormat;
+        $this->layout = $layout;
     }
 
     /**
@@ -138,6 +148,22 @@ class HistoricalPrice implements ArgumentInterface
     public function formatPrice(float $price, bool $includeContainer = true): string
     {
         return $this->priceCurrency->convertAndFormat($price, $includeContainer);
+    }
+
+    /**
+     * @param ProductInterface $product
+     * @param bool $longMessage
+     * @return string
+     */
+    public function getHistoricalPriceItemHtml(ProductInterface $product, bool $longMessage = false)
+    {
+        if (!($block = $this->layout->getBlock('item.historical.price'))) {
+            $block = $this->layout->createBlock(Template::class, 'item.historical.price')
+                ->setTemplate('Growcode_Omnibus::list/historical_price.phtml')
+                ->setHistoricalPrice($this);
+        }
+
+        return $block->setProduct($product)->setDisplayLongMessage($longMessage)->toHtml();
     }
 
     /**

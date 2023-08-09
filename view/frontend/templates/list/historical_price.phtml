@@ -20,5 +20,9 @@ $price = $lowestHistoricalPrice ? $lowestHistoricalPrice->getPrice() : $regularP
 $formattedPrice = $historicalPriceViewModel->formatPrice($price);
 ?>
 <div class="historical-price">
-    <?= __('Lowest price over the past 30 days: %1', $formattedPrice); ?>
+    <?php if ($block->getDisplayLongMessage()): ?>
+        <?= __('Lowest price over the past 30 days: %1', $formattedPrice); ?>
+    <?php else: ?>
+        <?= __('Lowest price: %1', $formattedPrice); ?>
+    <?php endif; ?>
 </div>
