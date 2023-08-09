@@ -23,18 +23,23 @@ $formattedPrice = $historicalPriceViewModel->formatPrice($price);
         return {
             lowestHistoricalPrices: <?= $historicalPriceViewModel->getConfigurableProductLowestHistoricalPrices($product); ?>,
             formattedPrice: '<?= $formattedPrice; ?>',
+            show: <?= $product->getTypeId() === 'configurable' ? 'false' : 'true'; ?>,
             eventListeners: {
                 ['@configurable-selection-changed.window'](event) {
                     const { productIndex } = event.detail;
-                    const price = this.lowestHistoricalPrices[productIndex] ?? <?= $price ?>;
-                    this.formattedPrice = hyva.formatPrice(price);
+                    const price = this.lowestHistoricalPrices[productIndex];
+
+                    if (price) {
+                        this.formattedPrice = hyva.formatPrice(price);
+                    }
+
+                    this.show = !!price;
                 },
             }
         }
     }
 </script>
-<div x-data="initHistoricalPrice<?= $product->getId(); ?>()"
-     x-bind="eventListeners">
+<div x-data="initHistoricalPrice<?= $product->getId(); ?>()" x-bind="eventListeners" x-cloak="" x-show="show">
     <span><?= __('Lowest price over the past 30 days:'); ?></span>
     <span x-html="formattedPrice"></span>
 </div>

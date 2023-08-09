@@ -18,7 +18,8 @@ $lowestHistoricalPrice = $historicalPriceViewModel->getLowestHistoricalPrice($bl
 $price = $lowestHistoricalPrice ? $lowestHistoricalPrice->getPrice() : $regularPrice;
 $formattedPrice = $historicalPriceViewModel->formatPrice($price);
 ?>
-<div class="historical-price">
+<div class="historical-price"
+     <?php if ($product->getTypeId() === 'configurable'): ?>style="display: none;"<?php endif; ?>>
     <?= __('Lowest price over the past 30 days: %1', $formattedPrice); ?>
 </div>
 <script type="text/x-magento-init">
