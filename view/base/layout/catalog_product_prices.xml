@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<layout xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/layout_generic.xsd">
+    <referenceBlock name="render.product.prices">
+        <arguments>
+            <argument name="default" xsi:type="array">
+                <item name="prices" xsi:type="array">
+                    <item name="final_price" xsi:type="array">
+                        <item name="render_template" xsi:type="string">Growcode_Omnibus::product/price/final_price.phtml</item>
+                    </item>
+                    <item name="configured_price" xsi:type="array">
+                        <item name="render_template" xsi:type="string">Growcode_Omnibus::product/price/configured_price.phtml</item>
+                    </item>
+                    <item name="wishlist_configured_price" xsi:type="array">
+                        <item name="render_template" xsi:type="string">Growcode_Omnibus::product/price/configured_price.phtml</item>
+                    </item>
+                </item>
+            </argument>
+            <argument name="configurable" xsi:type="array">
+                <item name="prices" xsi:type="array">
+                    <item name="final_price" xsi:type="array">
+                        <item name="render_template" xsi:type="string">Growcode_Omnibus::product/price/configurable/final_price.phtml</item>
+                    </item>
+                    <item name="wishlist_configured_price" xsi:type="array">
+                        <item name="render_template" xsi:type="string">Growcode_Omnibus::product/price/configurable/configured_price.phtml</item>
+                    </item>
+                </item>
+            </argument>
+        </arguments>
+    </referenceBlock>
+</layout>
