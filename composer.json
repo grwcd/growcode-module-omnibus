@@ -1,6 +1,6 @@
 {
   "name": "growcode/module-omnibus",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Omnibus module for tracking product price changes",
   "type": "magento2-module",
   "require": {

@@ -1,3 +1,6 @@
+# 1.4.1
+- Fix displaying lowest historical price message for products with an inactive special price
+
 # 1.4.0
 - Display lowest historical prices in price boxes
 - Add method for rendering historical price message via the view model

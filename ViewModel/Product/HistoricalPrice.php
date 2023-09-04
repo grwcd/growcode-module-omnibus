@@ -13,6 +13,7 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Locale\FormatInterface;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\LayoutInterface;
@@ -56,6 +57,11 @@ class HistoricalPrice implements ArgumentInterface
     private LayoutInterface $layout;
 
     /**
+     * @var TimezoneInterface
+     */
+    private TimezoneInterface $timezone;
+
+    /**
      * @param CollectionFactory $collectionFactory
      * @param PriceCurrencyInterface $priceCurrency
      * @param StoreManagerInterface $storeManager
@@ -63,6 +69,7 @@ class HistoricalPrice implements ArgumentInterface
      * @param ProductRepositoryInterface $productRepository
      * @param FormatInterface $localeFormat
      * @param LayoutInterface $layout
+     * @param TimezoneInterface $timezone
      */
     public function __construct(
         CollectionFactory          $collectionFactory,
@@ -71,7 +78,8 @@ class HistoricalPrice implements ArgumentInterface
         CatalogRule                $catalogRule,
         ProductRepositoryInterface $productRepository,
         FormatInterface            $localeFormat,
-        LayoutInterface            $layout
+        LayoutInterface            $layout,
+        TimezoneInterface          $timezone
     )
     {
         $this->collectionFactory = $collectionFactory;
@@ -81,6 +89,7 @@ class HistoricalPrice implements ArgumentInterface
         $this->productRepository = $productRepository;
         $this->localeFormat = $localeFormat;
         $this->layout = $layout;
+        $this->timezone = $timezone;
     }
 
     /**
@@ -179,7 +188,7 @@ class HistoricalPrice implements ArgumentInterface
         }
 
         if ($product->getTypeId() == 'configurable') {
-             $groups = $product->getTypeInstance()->getChildrenIds($product->getId());
+            $groups = $product->getTypeInstance()->getChildrenIds($product->getId());
 
             foreach ($groups as $group) {
                 foreach ($group as $childId) {
@@ -187,7 +196,7 @@ class HistoricalPrice implements ArgumentInterface
                         $childProduct = $this->productRepository->getById($childId);
                         $childCatalogRules = $this->catalogRule->getRulesFromProduct(time(), $websiteId, 0, $childId);
 
-                        if ($childProduct->getSpecialPrice() || !empty($childCatalogRules)) {
+                        if (!empty($childCatalogRules) || $this->isSpecialPriceActive($childProduct)) {
                             return true;
                         }
                     } catch (NoSuchEntityException $e) {
@@ -198,7 +207,7 @@ class HistoricalPrice implements ArgumentInterface
         } else {
             $catalogRules = $this->catalogRule->getRulesFromProduct(time(), $websiteId, 0, $product->getId());
 
-            return $product->getSpecialPrice() || !empty($catalogRules);
+            return !empty($catalogRules) || $this->isSpecialPriceActive($product);
         }
 
         return false;
@@ -231,6 +240,23 @@ class HistoricalPrice implements ArgumentInterface
         }
 
         return json_encode($prices);
+    }
+
+    /**
+     * @param ProductInterface $product
+     * @return bool
+     */
+    private function isSpecialPriceActive(ProductInterface $product): bool
+    {
+        $specialFromDate = $product->getSpecialFromDate();
+        $specialToDate = $product->getSpecialToDate();
+
+        return $product->getSpecialPrice()
+            && $this->timezone->isScopeDateInInterval(
+                $product->getStoreId(),
+                $specialFromDate,
+                $specialToDate
+            );
     }
 
     /**
