@@ -9,7 +9,7 @@ use Magento\Framework\View\Element\Template;
 
 $historicalPriceViewModel = $block->getHistoricalPrice();
 $product = $block->getProduct();
-$quantity = $block->getQuantity();
+$quantity = $block->getQuantity() ?? 1;
 
 if (!$product || !$historicalPriceViewModel->hasDiscount($product)) {
     return;

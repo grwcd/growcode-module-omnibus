@@ -8,7 +8,7 @@ use Magento\Catalog\Block\Product\View;
 
 $historicalPriceViewModel = $block->getHistoricalPrice();
 $product = $block->getProduct();
-$quantity = $block->getQuantity();
+$quantity = $block->getQuantity() ?? 1;
 
 if (!$historicalPriceViewModel->hasDiscount($product)) {
     return;
