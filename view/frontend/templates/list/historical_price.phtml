@@ -9,6 +9,7 @@ use Magento\Framework\View\Element\Template;
 
 $historicalPriceViewModel = $block->getHistoricalPrice();
 $product = $block->getProduct();
+$quantity = $block->getQuantity();
 
 if (!$product || !$historicalPriceViewModel->hasDiscount($product)) {
     return;
@@ -17,7 +18,7 @@ if (!$product || !$historicalPriceViewModel->hasDiscount($product)) {
 $regularPrice = $product->getPriceInfo()->getPrice(RegularPrice::PRICE_CODE)->getValue();
 $lowestHistoricalPrice = $historicalPriceViewModel->getLowestHistoricalPrice($block->getProduct()->getId());
 $price = $lowestHistoricalPrice ? $lowestHistoricalPrice->getPrice() : $regularPrice;
-$formattedPrice = $historicalPriceViewModel->formatPrice($price);
+$formattedPrice = $historicalPriceViewModel->formatPrice($price * $quantity);
 ?>
 <div class="historical-price">
     <?php if ($block->getDisplayLongMessage()): ?>

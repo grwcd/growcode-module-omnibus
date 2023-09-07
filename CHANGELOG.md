@@ -1,3 +1,6 @@
+# 1.5.0
+- Add quantity multiplier as optional parameter
+
 # 1.4.1
 - Fix displaying lowest historical price message for products with an inactive special price
 
