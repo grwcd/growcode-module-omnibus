@@ -1,4 +1,4 @@
-# 1.5.0
+# 2.0.0
 - Add quantity multiplier as optional parameter
 
 # 1.4.1
