@@ -88,6 +88,7 @@ class HistoricalPrice implements ArgumentInterface
         $collection = $this->collectionFactory->create();
         $collection->addFilter(HistoricalPriceInterface::PRODUCT_ID, $productId)
             ->addFilter(HistoricalPriceInterface::WEBSITE_ID, $websiteId)
+            ->addFieldToFilter(HistoricalPriceInterface::TIMESTAMP, ['gt' => date('Y-m-d H:i:s', strtotime('-30 days'))])
             ->setOrder('price', Collection::SORT_ORDER_ASC);
 
         if ($collection->count()) {
@@ -97,6 +98,7 @@ class HistoricalPrice implements ArgumentInterface
         $collection = $this->collectionFactory->create();
         $collection->addFilter(HistoricalPriceInterface::PRODUCT_ID, $productId)
             ->addFilter(HistoricalPriceInterface::WEBSITE_ID, 0)
+            ->addFieldToFilter(HistoricalPriceInterface::TIMESTAMP, ['gt' => date('Y-m-d H:i:s', strtotime('-30 days'))])
             ->setOrder('price', Collection::SORT_ORDER_ASC);
 
         if (!$collection->count()) {
