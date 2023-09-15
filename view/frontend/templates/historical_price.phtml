@@ -8,6 +8,7 @@ use Magento\Catalog\Block\Product\View;
 
 $historicalPriceViewModel = $block->getHistoricalPrice();
 $product = $block->getProduct();
+$quantity = $block->getQuantity() ?? 1;
 
 if (!$historicalPriceViewModel->hasDiscount($product)) {
     return;
@@ -16,7 +17,7 @@ if (!$historicalPriceViewModel->hasDiscount($product)) {
 $regularPrice = $product->getPriceInfo()->getPrice('regular_price')->getValue();
 $lowestHistoricalPrice = $historicalPriceViewModel->getLowestHistoricalPrice($block->getProduct()->getId());
 $price = $lowestHistoricalPrice ? $lowestHistoricalPrice->getPrice() : $regularPrice;
-$formattedPrice = $historicalPriceViewModel->formatPrice($price);
+$formattedPrice = $historicalPriceViewModel->formatPrice($price * $quantity);
 ?>
 <div class="historical-price"
      <?php if ($product->getTypeId() === 'configurable'): ?>style="display: none;"<?php endif; ?>>

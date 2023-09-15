@@ -162,14 +162,16 @@ class HistoricalPrice implements ArgumentInterface
     /**
      * @param ProductInterface $product
      * @param bool $longMessage
+     * @param int $quantity
      * @return string
      */
-    public function getHistoricalPriceItemHtml(ProductInterface $product, bool $longMessage = false)
+    public function getHistoricalPriceItemHtml(ProductInterface $product, bool $longMessage = false, int $quantity = 1)
     {
         if (!($block = $this->layout->getBlock('item.historical.price'))) {
             $block = $this->layout->createBlock(Template::class, 'item.historical.price')
                 ->setTemplate('Growcode_Omnibus::list/historical_price.phtml')
-                ->setHistoricalPrice($this);
+                ->setHistoricalPrice($this)
+                ->setQuantity($quantity);
         }
 
         return $block->setProduct($product)->setDisplayLongMessage($longMessage)->toHtml();
