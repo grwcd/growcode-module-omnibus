@@ -1,3 +1,8 @@
+# 1.2.1
+*(2023-09-14)*
+
+- Do not display historical prices older than 30 days
+
 # 1.2.0
 *(2023-06-22)*
 
