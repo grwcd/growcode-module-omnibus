@@ -1,3 +1,8 @@
+# 1.2.2
+*(2023-09-21)*
+
+- Fix displaying historical price message for configurable product selection
+
 # 1.2.1
 *(2023-09-14)*
 
