@@ -3,11 +3,14 @@
 namespace Growcode\Omnibus\ViewModel\Product;
 
 use Growcode\Omnibus\Api\Data\HistoricalPriceInterface;
+use Growcode\Omnibus\Model\ResourceModel\HistoricalPrice\Collection as HistoricalPriceCollection;
 use Growcode\Omnibus\Model\ResourceModel\HistoricalPrice\CollectionFactory;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
+use Magento\Catalog\Pricing\Price\RegularPrice;
 use Magento\CatalogRule\Model\ResourceModel\Rule as CatalogRule;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Framework\Data\Collection;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -94,7 +97,7 @@ class HistoricalPrice implements ArgumentInterface
 
     /**
      * @param int $productId
-     * @return HistoricalPriceInterface
+     * @return HistoricalPriceInterface|null
      */
     public function getLowestHistoricalPrice(int $productId): ?HistoricalPriceInterface
     {
@@ -104,43 +107,69 @@ class HistoricalPrice implements ArgumentInterface
             $websiteId = 0;
         }
 
-        $collection = $this->collectionFactory->create();
-        $collection->addFilter(HistoricalPriceInterface::PRODUCT_ID, $productId)
-            ->addFilter(HistoricalPriceInterface::WEBSITE_ID, $websiteId)
-            ->setOrder('price', Collection::SORT_ORDER_ASC);
-
-        if ($collection->count()) {
-            return $this->getFirstPrice($collection, $productId);
-        }
-
-        $collection = $this->collectionFactory->create();
-        $collection->addFilter(HistoricalPriceInterface::PRODUCT_ID, $productId)
-            ->addFilter(HistoricalPriceInterface::WEBSITE_ID, 0)
-            ->setOrder('price', Collection::SORT_ORDER_ASC);
-
-        if (!$collection->count()) {
+        try {
+            $product = $this->productRepository->getById($productId);
+        } catch (NoSuchEntityException $e) {
             return null;
         }
 
-        return $this->getFirstPrice($collection, $productId);
+        if ($product->getTypeId() === Configurable::TYPE_CODE) {
+            $groups = $product->getTypeInstance()->getChildrenIds($product->getId());
+            $productIds = array_merge(...$groups);
+        } else {
+            $productIds = [$productId];
+        }
+
+        $collection = $this->searchHistoricalPrices($productIds, $websiteId);
+
+        return $collection->count() ? $this->getFirstPrice($collection, $productId) : null;
+    }
+
+    private function searchHistoricalPrices(array $productIds, $websiteId): ?HistoricalPriceCollection
+    {
+        /** @var HistoricalPriceCollection $collection */
+        $collection = $this->collectionFactory->create();
+        $collection->addFieldToFilter(HistoricalPriceInterface::PRODUCT_ID, ['in' => $productIds])
+            ->addFilter(HistoricalPriceInterface::WEBSITE_ID, $websiteId)
+            ->setOrder('price', Collection::SORT_ORDER_ASC);
+
+        if (!$collection->count()) {
+            /** @var HistoricalPriceCollection $collection */
+            $collection = $this->collectionFactory->create();
+            $collection->addFieldToFilter(HistoricalPriceInterface::PRODUCT_ID, ['in' => $productIds])
+                ->addFilter(HistoricalPriceInterface::WEBSITE_ID, 0)
+                ->setOrder('price', Collection::SORT_ORDER_ASC);
+        }
+
+        return $collection;
     }
 
     /**
      * @param Collection $collection
      * @param int $productId
-     * @return HistoricalPriceInterface
+     * @return HistoricalPriceInterface|null
      */
     public function getFirstPrice(Collection $collection, int $productId): ?HistoricalPriceInterface
     {
         try {
-            $product = $this->productRepository->getById($productId);
+            $parentProduct = $this->productRepository->getById($productId);
         } catch (NoSuchEntityException $e) {
             /** @var HistoricalPriceInterface */
             return $collection->getFirstItem();
         }
 
+        $product = $parentProduct;
+
         /** @var HistoricalPriceInterface $item */
         foreach ($collection as $item) {
+            if ($parentProduct->getTypeId() === Configurable::TYPE_CODE) {
+                try {
+                    $product = $this->productRepository->getById($item->getProductId());
+                } catch (NoSuchEntityException $e) {
+                    continue;
+                }
+            }
+
             if ($item->getPrice() != $product->getFinalPrice()) {
                 return $item;
             }
@@ -219,7 +248,7 @@ class HistoricalPrice implements ArgumentInterface
      * @param Product $product
      * @return false|string
      */
-    public function getConfigurableProductLowestHistoricalPrices(Product $product)
+    public function getConfigurableProductLowestHistoricalPrices(Product $product): false|string
     {
         $groups = $product->getTypeInstance()->getChildrenIds($product->getId());
         $prices = [];
@@ -233,7 +262,7 @@ class HistoricalPrice implements ArgumentInterface
                 } else {
                     try {
                         $childProduct = $this->productRepository->getById($childId);
-                        $prices[$childId] = $childProduct->getFinalPrice();
+                        $prices[$childId] = $childProduct->getPriceInfo()->getPrice(RegularPrice::PRICE_CODE)->getValue();
                     } catch (NoSuchEntityException $e) {
                         continue;
                     }
